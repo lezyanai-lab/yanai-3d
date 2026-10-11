@@ -2,7 +2,7 @@
   {
     "name": "שחור",
     "hex": "#1a1a1a",
-    "inStock": false
+    "inStock": true
   },
   {
     "name": "לבן",
@@ -27,7 +27,7 @@
   {
     "name": "אדום",
     "hex": "#dc2626",
-    "inStock": false
+    "inStock": true
   },
   {
     "name": "אפור",
@@ -47,6 +47,6 @@
   {
     "name": "ורוד",
     "hex": "#ec4899",
-    "inStock": false
+    "inStock": true
   }
 ]
