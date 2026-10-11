@@ -3,13 +3,16 @@ import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { CartProvider } from "./lib/cart.jsx";
+import { AdminProvider } from "./lib/admin.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <HashRouter>
-    <CartProvider>
-      <App />
-    </CartProvider>
+    <AdminProvider>
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </AdminProvider>
   </HashRouter>
 );
 

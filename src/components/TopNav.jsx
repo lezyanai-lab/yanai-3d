@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, ShoppingCart, ArrowRight, HelpCircle, X } from "lucide-react";
+import { Menu, ShoppingCart, ArrowRight, HelpCircle, Settings, X } from "lucide-react";
 import { useCart } from "../lib/cart.jsx";
 
 export default function TopNav({ back = false }) {
@@ -37,7 +37,7 @@ export default function TopNav({ back = false }) {
       {open && (
         <div className="fixed inset-0 z-40 bg-black/40" onClick={() => setOpen(false)}>
           <aside
-            className="absolute right-0 top-0 h-full w-[280px] bg-white p-5"
+            className="absolute right-0 top-0 h-full w-[280px] bg-white p-5 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
@@ -52,6 +52,15 @@ export default function TopNav({ back = false }) {
               className="flex items-center gap-3 py-3 text-slate-800"
             >
               <HelpCircle className="w-5 h-5" /> שאלות נפוצות
+            </Link>
+
+            {/* כפתור הגדרות למנהל - בכוונה לא בולט */}
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              className="mt-auto flex items-center gap-2 py-2 text-xs text-slate-300"
+            >
+              <Settings className="w-3.5 h-3.5" /> הגדרות
             </Link>
           </aside>
         </div>

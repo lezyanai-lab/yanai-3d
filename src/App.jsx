@@ -6,6 +6,7 @@ import ModelDetail from "./pages/ModelDetail.jsx";
 import FAQ from "./pages/FAQ.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
+import Admin from "./pages/Admin.jsx";
 
 function Maintenance() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
+      <Route path="/admin" element={<Admin />} />
       <Route path="*" element={<Home />} />
     </Routes>
   );
