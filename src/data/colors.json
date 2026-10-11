@@ -27,7 +27,7 @@
   {
     "name": "אדום",
     "hex": "#dc2626",
-    "inStock": true
+    "inStock": false
   },
   {
     "name": "אפור",
@@ -47,6 +47,6 @@
   {
     "name": "ורוד",
     "hex": "#ec4899",
-    "inStock": true
+    "inStock": false
   }
 ]
