@@ -53,5 +53,10 @@
     "name": "תכלת",
     "hex": "#55B9E5",
     "inStock": true
+  },
+  {
+    "name": "סגול זוהר",
+    "hex": "#8A2BE2",
+    "inStock": true
   }
 ]
