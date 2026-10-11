@@ -21,7 +21,7 @@
   },
   {
     "name": "חום",
-    "hex": "#92400e",
+    "hex": "#795548",
     "inStock": true
   },
   {
@@ -47,6 +47,11 @@
   {
     "name": "ורוד",
     "hex": "#ec4899",
+    "inStock": true
+  },
+  {
+    "name": "תכלת",
+    "hex": "#55B9E5",
     "inStock": true
   }
 ]
