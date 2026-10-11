@@ -1,0 +1,13 @@
+// כדי לסמן צבע כאזל: inStock: false (ואז commit)
+export const COLORS = [
+  { name: "שחור", hex: "#1a1a1a", inStock: true },
+  { name: "לבן", hex: "#f3f4f6", inStock: true },
+  { name: "כחול", hex: "#2563eb", inStock: true },
+  { name: "צהוב", hex: "#eab308", inStock: true },
+  { name: "חום", hex: "#92400e", inStock: true },
+  { name: "אדום", hex: "#dc2626", inStock: true },
+  { name: "אפור", hex: "#9ca3af", inStock: true },
+  { name: "כתום", hex: "#F49C82", inStock: true },
+  { name: "ירוק", hex: "#16a34a", inStock: true },
+  { name: "ורוד", hex: "#ec4899", inStock: true },
+];
