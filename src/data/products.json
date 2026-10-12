@@ -13,19 +13,6 @@
     "hidden": false
   },
   {
-    "id": "p01",
-    "name": "קליקר סוכה 🍋",
-    "price": 8,
-    "priceText": "ב 8 ש''ח במקום 10",
-    "desc": "במיוחד לחג סוכות קליקר סוכה! 🍋🎉",
-    "img": "01.jpg",
-    "colors": 1,
-    "colorLabels": [],
-    "link": "",
-    "specialOffer": null,
-    "hidden": false
-  },
-  {
     "id": "p02",
     "name": "קליקר ספיידרמן",
     "price": 8,
