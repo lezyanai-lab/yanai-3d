@@ -1,39 +1,5 @@
-// מסודר מהחדש לישן. price = מספר לחישוב, priceText = טקסט להצגה (אופציונלי).
-// colors: 2 = מוצר בהתאמה אישית (שני צבעים + טקסט).
-export const PRODUCTS = [
-  { id: "p01", name: "קליקר סוכה 🍋", price: 8, priceText: "ב 8 ש''ח במקום 10", desc: "במיוחד לחג סוכות קליקר סוכה! 🍋🎉", img: "01.jpg", colors: 1 },
-  { id: "p02", name: "קליקר ספיידרמן", price: 8, desc: "קליקר ספיידרמן כיפי ויפה", img: "02.jpg", colors: 1 },
-  { id: "p03", name: "מנעול לבקבוקים", price: 8, desc: "מנעול לבקבוקים, מתאים לכל סוגי הבקבוקים! ( לא כולל יינות) \nאפשר לבחור את גודל החור לפי המנעול \n3.6/8 מ''מ קוטר פנימי של החור\n(המוצר לא כולל מנעול!)", img: "03.jpg", colors: 1 },
-  { id: "p04", name: "מחזיק מפתחות שם", price: 4, desc: "כל אות נוספת שקל\nמחזיק מפתחות שם בהתאמה אישית מלאה!\nכולל צבעים, כמויות, טבעת ומלל!\nאפשר לבחור שפה", img: "04.jpg", colors: 2 },
-  { id: "p05", name: "קליקר מקלדת", price: 10, desc: "קליקר מקלדת בהתאמה אישית מלאה!\nעם טבעת למחזיק מפתחות \n10 שקל עד 4 אותיות\nכל אות נוספת 2 שקל\nאפשר לבחור שפה וצבעים", img: "05.png", colors: 2 },
-  { id: "p06", name: "מעמד לקורקינט", price: 35, desc: "מעמד חזק ועמיד לקורקינט", img: "06.jpg", colors: 1 },
-  { id: "p07", name: "מתלה מגבות", price: 10, desc: "", img: "07.jpg", colors: 1 },
-  { id: "p08", name: "חלקי לגו", price: 1, desc: "מגוון חלקי לגו בכל הגדלים ובכל הצבעים\nהמחיר משתנה בהתאם לחלק של הלגו", img: "08.jpg", colors: 1 },
-  { id: "p09", name: "דמויות לגו", price: 2, desc: "דמויות לגו:\nדמות אחת ב-2 שקל\n50 דמויות ב 80 שקל", img: "09.png", colors: 1 },
-  { id: "p10", name: "חרב", price: 10, desc: "", img: "10.jpg", colors: 1 },
-  { id: "p11", name: "כדור לחיצה", price: 7, desc: "", img: "11.jpg", colors: 1 },
-  { id: "p12", name: "כוס אינסופית", price: 17, desc: "", img: "12.jpg", colors: 1 },
-  { id: "p13", name: "לוח 9 לחצנים", price: 7, desc: "", img: "13.jpg", colors: 1 },
-  { id: "p14", name: "לחצנים מתחלפים", price: 8, desc: "", img: "14.jpg", colors: 1 },
-  { id: "p15", name: "מיני קורקינט פעלולים", price: 6, desc: "", img: "15.jpg", colors: 1 },
-  { id: "p16", name: "מכסה מגנטי למברשת שיניים", price: 6, desc: "", img: "16.jpeg", colors: 1 },
-  { id: "p17", name: "פידג'ט אינסופי", price: 7, desc: "", img: "17.jpeg", colors: 1 },
-  { id: "p18", name: "פידג'ט גלגל שיניים", price: 8, desc: "", img: "18.jpeg", colors: 1 },
-  { id: "p19", name: "פידג'ט משולשים אינסופי", price: 9, desc: "", img: "19.jpg", colors: 1 },
-  { id: "p20", name: "פידג'ט משולשים", price: 7, desc: "", img: "20.jpeg", colors: 1 },
-  { id: "p21", name: "פידג'ט ספירלה", price: 7, desc: "", img: "21.jpeg", colors: 1 },
-  { id: "p22", name: "פידג'ט צורות משתנות", price: 20, desc: "", img: "22.jpg", colors: 1 },
-  { id: "p23", name: "קליקר ביצת עין", price: 10, desc: "", img: "23.jpg", colors: 1 },
-  { id: "p24", name: "קליקר גולגולת", price: 7, desc: "", img: "24.jpg", colors: 1 },
-  { id: "p25", name: "קליקר יד של כלב", price: 15, desc: "קליקר כף יד של כלב עם 6 לחצנים", img: "25.jpg", colors: 1 },
-  { id: "p26", name: "קליקר piston", price: 10, desc: "קליקר piston ממינקראפט", img: "26.jpg", colors: 1 },
-  { id: "p27", name: "קליקר דשא", price: 10, desc: "קליקר דשא ממיינקראפט", img: "27.jpg", colors: 1 },
-  { id: "p28", name: "קליקר פצצה", price: 8, desc: "קליקר פצצה ממיינקראפט", img: "28.jpg", colors: 1 },
-  { id: "p29", name: "קליקר פרינגלס", price: 7, desc: "קליקר פרינגלס מחזיק מפתחות", img: "29.jpg", colors: 1 },
-  { id: "p30", name: "קליקר תמנון", price: 8, desc: "קליקר תמנון עם זרועות זזות", img: "30.jpg", colors: 1 },
-  { id: "p31", name: "קשת לשיער", price: 8, desc: "", img: "31.jpeg", colors: 1 },
-  { id: "p32", name: "קליקר שוקולד", price: 4, priceText: "4-10", desc: "קליקר שוקולד ב-4 גדלים", img: "32.jpeg", colors: 1 },
-  { id: "p33", name: "מחזיק מפתחות לב", price: 4, desc: "", img: "33.png", colors: 1 },
-];
+// המוצרים נערכים ממסך המנהל (הגדרות ← מוצרים) והנתונים נשמרים ב-products.json
+import data from "./products.json";
 
-export const COLOR_LABELS_2 = ["צבע בסיס", "צבע טקסט"];
+export const PRODUCTS = data.filter((p) => !p.hidden);
+export const DEFAULT_LABELS = ["צבע בסיס", "צבע טקסט"];

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ShoppingCart, Trash2, Minus, Plus } from "lucide-react";
 import TopNav from "../components/TopNav.jsx";
-import { useCart } from "../lib/cart.jsx";
+import { useCart, itemTotal } from "../lib/cart.jsx";
 import { img } from "../lib/config.js";
 
 export default function Cart() {
@@ -32,6 +32,11 @@ export default function Cart() {
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm">{it.modelName}</p>
                 <p className="text-xs text-slate-500">₪{it.price} ליחידה</p>
+                {it.specialOffer?.packSize > 1 && (
+                  <p className="text-xs text-green-600">
+                    מבצע: {it.specialOffer.packSize} ב־{it.specialOffer.packPrice} ₪
+                  </p>
+                )}
                 {it.colors.map((c, i) => (
                   <p key={i} className="flex items-center gap-1 text-xs text-slate-600">
                     <span className="w-3 h-3 rounded-full border border-slate-200" style={{ background: c.hex }} />
@@ -50,7 +55,7 @@ export default function Cart() {
                     </button>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="font-bold text-sm">₪{it.price * it.quantity}</span>
+                    <span className="font-bold text-sm">₪{itemTotal(it)}</span>
                     <button onClick={() => removeFromCart(it.key)} aria-label="הסר">
                       <Trash2 className="w-4 h-4 text-slate-400" />
                     </button>

@@ -1,9 +1,15 @@
-// עדכון קובץ הצבעים ישירות ב-GitHub מתוך מסך המנהל.
-// "הסיסמה" של המנהל היא טוקן אישי של GitHub שנשמר רק בדפדפן של המנהל (לא בקוד).
+// עדכון קבצי האתר ישירות ב-GitHub מתוך מסך המנהל.
+// הטוקן מתקבל מפענוח הקובץ המוצפן (אימייל + סיסמה) ולא נמצא בקוד.
 export const REPO = { owner: "lezyanai-lab", repo: "yanai-3d", branch: "main" };
-export const COLORS_PATH = "src/data/colors.json";
+export const FILES = {
+  products: "src/data/products.json",
+  faq: "src/data/faq.json",
+  colors: "src/data/colors.json",
+  settings: "src/data/settings.json",
+};
 
 const API = "https://api.github.com";
+const base = `${API}/repos/${REPO.owner}/${REPO.repo}/contents`;
 
 const headers = (token) => ({
   Accept: "application/vnd.github+json",
@@ -15,52 +21,48 @@ const headers = (token) => ({
 const enc = (s) => btoa(unescape(encodeURIComponent(s)));
 const dec = (b) => decodeURIComponent(escape(atob(b.replace(/\n/g, ""))));
 
-export async function verifyToken(token) {
-  try {
-    const res = await fetch(`${API}/repos/${REPO.owner}/${REPO.repo}`, {
-      headers: headers(token),
-      cache: "no-store",
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
+function authError(status) {
+  if (status === 401 || status === 403 || status === 404)
+    return new Error("אין הרשאת כתיבה ל-GitHub. בדוק שהטוקן עדיין בתוקף ושיש לו Contents: Read and write.");
+  return null;
 }
 
-export async function getColorsFile(token) {
-  const res = await fetch(
-    `${API}/repos/${REPO.owner}/${REPO.repo}/contents/${COLORS_PATH}?ref=${REPO.branch}`,
-    { headers: headers(token), cache: "no-store" }
-  );
-  if (!res.ok) throw new Error(`טעינת הצבעים נכשלה (${res.status})`);
+export async function getJson(token, path) {
+  const res = await fetch(`${base}/${path}?ref=${REPO.branch}`, { headers: headers(token), cache: "no-store" });
+  if (!res.ok) throw authError(res.status) || new Error(`הטעינה נכשלה (${res.status})`);
   const json = await res.json();
-  return { sha: json.sha, colors: JSON.parse(dec(json.content)) };
+  return { sha: json.sha, data: JSON.parse(dec(json.content)) };
 }
 
-async function put(token, colors, sha) {
-  return fetch(`${API}/repos/${REPO.owner}/${REPO.repo}/contents/${COLORS_PATH}`, {
+async function putJson(token, path, data, sha, message) {
+  return fetch(`${base}/${path}`, {
     method: "PUT",
     headers: { ...headers(token), "Content-Type": "application/json" },
     body: JSON.stringify({
-      message: "עדכון צבעים ממסך המנהל",
-      content: enc(JSON.stringify(colors, null, 2) + "\n"),
+      message,
+      content: enc(JSON.stringify(data, null, 2) + "\n"),
       sha,
       branch: REPO.branch,
     }),
   });
 }
 
-export async function saveColors(token, colors, sha) {
-  let res = await put(token, colors, sha);
+export async function saveJson(token, path, data, sha, message = "עדכון ממסך המנהל") {
+  let res = await putJson(token, path, data, sha, message);
   if (res.status === 409 || res.status === 422) {
-    // הקובץ השתנה בינתיים - מושכים sha עדכני ומנסים שוב פעם אחת
-    const fresh = await getColorsFile(token);
-    res = await put(token, colors, fresh.sha);
+    const fresh = await getJson(token, path); // הקובץ השתנה בינתיים - sha עדכני וניסיון נוסף
+    res = await putJson(token, path, data, fresh.sha, message);
   }
-  if (res.status === 401 || res.status === 403 || res.status === 404) {
-    throw new Error("אין לטוקן הרשאת כתיבה ל-repo (נדרש Contents: Read and write)");
-  }
-  if (!res.ok) throw new Error(`השמירה נכשלה (${res.status})`);
-  const json = await res.json();
-  return json.content.sha;
+  if (!res.ok) throw authError(res.status) || new Error(`השמירה נכשלה (${res.status})`);
+  return (await res.json()).content.sha;
+}
+
+// העלאת קובץ בינארי (תמונה) לנתיב חדש
+export async function uploadBinary(token, path, base64, message = "העלאת תמונה ממסך המנהל") {
+  const res = await fetch(`${base}/${path}`, {
+    method: "PUT",
+    headers: { ...headers(token), "Content-Type": "application/json" },
+    body: JSON.stringify({ message, content: base64, branch: REPO.branch }),
+  });
+  if (!res.ok) throw authError(res.status) || new Error(`העלאת התמונה נכשלה (${res.status})`);
 }

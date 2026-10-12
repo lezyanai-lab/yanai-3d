@@ -1,12 +1,14 @@
-export const WHATSAPP = "972559301212";
-export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP}`;
-export const WHATSAPP_DEEP = `whatsapp://send?phone=${WHATSAPP}`;
-export const BIT_LINK =
-  "https://www.bitpay.co.il/app/me/5E915D2A-BD8C-197E-73BB-6461700228C529AB";
-export const PHONE_ORDERS = "055-9301212";
-export const PHONE_BIT = "052-8793883";
+// ההגדרות נערכות ממסך המנהל (הגדרות ← הגדרות אתר) ונשמרות ב-settings.json
+import settings from "../data/settings.json";
 
-// שנה ל-true כדי לסגור את האתר לתחזוקה (ואז commit)
-export const MAINTENANCE = false;
+export const SETTINGS = settings;
+export const WHATSAPP = settings.whatsapp;
+export const WHATSAPP_LINK = `https://wa.me/${settings.whatsapp}`;
+export const WHATSAPP_DEEP = `whatsapp://send?phone=${settings.whatsapp}`;
+export const BIT_LINK = settings.bitLink;
+export const PHONE_ORDERS = settings.phoneOrders;
+export const PHONE_BIT = settings.phoneBit;
+export const MAINTENANCE = !!settings.maintenance;
 
-export const img = (name) => `${import.meta.env.BASE_URL}images/${name}`;
+export const img = (name) =>
+  /^(https?:)?\/\//.test(name) ? name : `${import.meta.env.BASE_URL}images/${name}`;

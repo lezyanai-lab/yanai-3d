@@ -1,4 +1,12 @@
-import { WHATSAPP_LINK, WHATSAPP_DEEP, BIT_LINK, PHONE_ORDERS, PHONE_BIT, img } from "../lib/config.js";
+import {
+  WHATSAPP_LINK,
+  WHATSAPP_DEEP,
+  BIT_LINK,
+  PHONE_ORDERS,
+  PHONE_BIT,
+  SETTINGS,
+  img,
+} from "../lib/config.js";
 
 const QR = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
   WHATSAPP_LINK
@@ -28,13 +36,13 @@ export default function Footer() {
         </a>
 
         <a href={BIT_LINK} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-2">
-          <img src={img("bit-logo.png")} alt="Bit" className="w-8 h-8 rounded-lg" />
-          <img src={img("bit-qr.jpeg")} alt="QR ביט" className="w-28 h-28 object-contain" />
+          <img src={img(SETTINGS.bitLogo)} alt="Bit" className="w-8 h-8 rounded-lg" />
+          <img src={img(SETTINGS.bitQr)} alt="QR ביט" className="w-28 h-28 object-contain" />
           <span dir="ltr" className="text-sm text-slate-700">{PHONE_BIT}</span>
         </a>
       </div>
 
-      <p className="text-xs text-slate-400">Yanai 3D Models · הדפסות תלת-ממד בהתאמה אישית</p>
+      <p className="text-xs text-slate-400">{SETTINGS.footerNote}</p>
     </footer>
   );
 }

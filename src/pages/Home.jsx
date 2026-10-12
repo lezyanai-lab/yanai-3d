@@ -5,7 +5,7 @@ import Footer from "../components/Footer.jsx";
 import InstallPrompt from "../components/InstallPrompt.jsx";
 import { PRODUCTS } from "../data/products.js";
 import { COLORS } from "../lib/colors.js";
-import { img } from "../lib/config.js";
+import { img, SETTINGS } from "../lib/config.js";
 
 const SORTS = [
   ["none", "ללא מיון"],
@@ -36,11 +36,16 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <TopNav />
+      {SETTINGS.announcement?.trim() && (
+        <div className="bg-amber-100 text-amber-900 text-center text-sm font-semibold py-2 px-4">
+          {SETTINGS.announcement}
+        </div>
+      )}
       <main className="max-w-md mx-auto px-4 pt-4">
         <InstallPrompt />
         <div className="flex items-start gap-4 mb-4">
           <img
-            src={img("logo.jpg")}
+            src={img(SETTINGS.logo)}
             alt="YANAI 3D"
             className="w-36 h-36 rounded-full bg-slate-50 ring-1 ring-slate-100 object-cover shrink-0"
           />
@@ -64,17 +69,19 @@ export default function Home() {
         </div>
 
         <div className="bg-blue-700 text-white text-center rounded-xl py-3 font-bold mb-3">
-          הזמנות בהתאמה אישית
+          {SETTINGS.bannerTitle}
         </div>
         <p className="text-center text-sm text-slate-600 mb-5 leading-relaxed">
-          הדפסות תלת מימד איכותיות
-          <br />
-          מחזיקי מפתחות, משחקים, פידג'יטים
-          <br />
-          ועוד...
+          {SETTINGS.intro.split("\n").map((line, i) => (
+            <span key={i}>
+              {i > 0 && <br />}
+              {line}
+            </span>
+          ))}
         </p>
 
-        <div className="flex items-center justify-end gap-2 mb-3">
+        {/* בכיוון RTL, justify-start = צד ימין */}
+        <div className="flex items-center justify-start gap-2 mb-3">
           <label className="text-sm text-slate-500">מיון</label>
           <select
             value={sort}
@@ -99,6 +106,7 @@ export default function Home() {
             </Link>
           ))}
         </div>
+        {list.length === 0 && <p className="text-center text-slate-400 py-10">אין דגמים עדיין</p>}
 
         <Footer />
       </main>

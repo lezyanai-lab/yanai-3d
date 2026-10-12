@@ -3,6 +3,17 @@ import { createContext, useContext, useEffect, useState } from "react";
 const CartContext = createContext(null);
 const KEY = "yanai3d_cart";
 
+// מחיר שורה בעגלה, כולל מבצע חבילה (למשל 5 ב-35)
+export function itemTotal(i) {
+  const o = i.specialOffer;
+  if (o && o.packSize > 1 && o.packPrice > 0) {
+    const packs = Math.floor(i.quantity / o.packSize);
+    const rest = i.quantity % o.packSize;
+    return packs * o.packPrice + rest * i.price;
+  }
+  return i.price * i.quantity;
+}
+
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
     try {
@@ -33,6 +44,7 @@ export function CartProvider({ children }) {
           img: model.img,
           colors,
           customText,
+          specialOffer: model.specialOffer || null,
           quantity: 1,
         },
       ];
@@ -47,7 +59,7 @@ export function CartProvider({ children }) {
   const clearCart = () => setItems([]);
 
   const count = items.reduce((s, i) => s + i.quantity, 0);
-  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const total = items.reduce((s, i) => s + itemTotal(i), 0);
 
   return (
     <CartContext.Provider

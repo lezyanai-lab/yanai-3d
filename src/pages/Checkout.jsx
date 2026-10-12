@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TopNav from "../components/TopNav.jsx";
-import { useCart } from "../lib/cart.jsx";
+import { useCart, itemTotal } from "../lib/cart.jsx";
 import { WHATSAPP_LINK } from "../lib/config.js";
 
 function buildMessage({ name, phone, notes, items }) {
@@ -17,6 +17,7 @@ function buildMessage({ name, phone, notes, items }) {
       lines.push(`צבע: ${it.colors[0]?.name ?? ""}`);
     }
     if (it.quantity > 1) lines.push(`כמות: ${it.quantity}`);
+    if (it.specialOffer?.packSize > 1) lines.push(`מבצע: ${it.specialOffer.packSize} ב־${it.specialOffer.packPrice} ₪`);
     lines.push("");
   });
   lines.push("הערות:");
@@ -71,7 +72,7 @@ export default function Checkout() {
           {items.map((it) => (
             <div key={it.key} className="flex justify-between">
               <span>{it.modelName} × {it.quantity}</span>
-              <span>₪{it.price * it.quantity}</span>
+              <span>₪{itemTotal(it)}</span>
             </div>
           ))}
           <div className="flex justify-between font-bold border-t border-slate-100 pt-2 mt-2">
