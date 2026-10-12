@@ -29,23 +29,28 @@ export function CartProvider({ children }) {
     } catch {}
   }, [items]);
 
-  const addToCart = (model, colors, customText = "") => {
-    const key = `${model.id}__${colors.map((c) => c.name).join("__")}__${customText}`;
+  const addToCart = (model, colors, customText = "", explicitPrice = null, meta = {}) => {
+    const priceToUse = explicitPrice !== null ? Number(explicitPrice) : Number(model.price || 0);
+    const partCount = Number(meta.partCount || 0);
+    const key = `${model.id}__${(colors || []).map((c) => c?.name || "none").join("__")}__${customText}__${partCount}`;
+
     setItems((prev) => {
       const found = prev.find((i) => i.key === key);
       if (found) return prev.map((i) => (i.key === key ? { ...i, quantity: i.quantity + 1 } : i));
+
       return [
         ...prev,
         {
           key,
           modelId: model.id,
           modelName: model.name,
-          price: model.price,
+          price: Number(priceToUse.toFixed(2)),
           img: model.img,
           colors,
           customText,
           specialOffer: model.specialOffer || null,
           quantity: 1,
+          meta: { ...(meta || {}) },
         },
       ];
     });
@@ -53,18 +58,14 @@ export function CartProvider({ children }) {
 
   const removeFromCart = (key) => setItems((p) => p.filter((i) => i.key !== key));
   const updateQuantity = (key, delta) =>
-    setItems((p) =>
-      p.map((i) => (i.key === key ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i))
-    );
+    setItems((p) => p.map((i) => (i.key === key ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i)));
   const clearCart = () => setItems([]);
 
   const count = items.reduce((s, i) => s + i.quantity, 0);
   const total = items.reduce((s, i) => s + itemTotal(i), 0);
 
   return (
-    <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, count, total }}
-    >
+    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, count, total }}>
       {children}
     </CartContext.Provider>
   );
