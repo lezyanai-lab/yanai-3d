@@ -15,17 +15,16 @@ function getDynamicPrice(model, text = "", partCount = 1) {
   if (model.textPricing?.kind === "perChar") {
     const included = Number(model.textPricing.included || 0);
     const extra = Math.max(0, String(text || "").length - included);
-    return base + extra * Number(model.textPricing.perChar || 0);
+    return Number((base + extra * Number(model.textPricing.perChar || 0)).toFixed(2));
   }
 
   if (model.partPricing?.kind === "parts") {
     const unitPrice = Number(model.partPricing.unitPrice ?? base);
-    const minimum = Math.max(1, Number(model.partPricing.min || 1));
-    const qty = Math.max(minimum, Number(partCount || 0));
-    return unitPrice * qty;
+    const qty = Math.max(1, Number(partCount || model.partPricing.min || 1));
+    return Number((unitPrice * qty).toFixed(2));
   }
 
-  return base;
+  return Number(base.toFixed(2));
 }
 
 export default function ModelDetail() {
@@ -42,21 +41,22 @@ export default function ModelDetail() {
 
   const [selected, setSelected] = useState(() => Array.from({ length: Math.max(0, totalColors) }, () => null));
   const [text, setText] = useState("");
-  const [partCount, setPartCount] = useState(() => Math.max(1, Number(model?.partPricing?.defaultQty || model?.partPricing?.min || 1)));
+  const [partCount, setPartCount] = useState(() => {
+    if (!model?.partPricing) return 1;
+    return Math.max(1, Number(model.partPricing.defaultQty || model.partPricing.min || 1));
+  });
   const [added, setAdded] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    setSelected((prev) =>
-      Array.from({ length: Math.max(0, totalColors) }, (_, i) => prev[i] ?? null)
-    );
+    setSelected((prev) => Array.from({ length: Math.max(0, totalColors) }, (_, i) => prev[i] ?? null));
   }, [totalColors, model?.id]);
 
   useEffect(() => {
-    if (model?.partPricing?.defaultQty || model?.partPricing?.min) {
+    if (model?.partPricing) {
       setPartCount(Math.max(1, Number(model.partPricing.defaultQty || model.partPricing.min || 1)));
     }
-  }, [model?.id]);
+  }, [model?.id, model?.partPricing]);
 
   if (!model) {
     return (
@@ -105,7 +105,7 @@ export default function ModelDetail() {
     } catch {}
   };
 
-  const itemPriceLabel = model.priceText || currentPrice;
+  const itemPriceLabel = model.priceText && !needsText && !needsPartCount ? model.priceText : currentPrice;
 
   return (
     <div className="min-h-screen pb-24">
@@ -215,323 +215,3 @@ export default function ModelDetail() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
