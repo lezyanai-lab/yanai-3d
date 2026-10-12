@@ -10,5 +10,10 @@ export const PHONE_ORDERS = settings.phoneOrders;
 export const PHONE_BIT = settings.phoneBit;
 export const MAINTENANCE = !!settings.maintenance;
 
-export const img = (name) =>
-  /^(https?:)?\/\//.test(name) ? name : `${import.meta.env.BASE_URL}images/${name}`;
+export const img = (name, cacheBust = false) => {
+  if (!name) return "";
+  if (/^(https?:)?\/\//.test(name)) return name;
+  const url = `${import.meta.env.BASE_URL}images/${name}`;
+  if (!cacheBust) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}v=${Date.now()}`;
+};
