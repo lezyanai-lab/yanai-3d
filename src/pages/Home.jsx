@@ -109,6 +109,7 @@ export default function Home() {
         {list.length === 0 && <p className="text-center text-slate-400 py-10">אין דגמים עדיין</p>}
 
         <Footer />
+        <p className="text-center text-[10px] text-slate-300 mt-6">גרסה {__BUILD__}</p>
       </main>
     </div>
   );
