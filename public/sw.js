@@ -1,4 +1,6 @@
-const CACHE = "yanai3d-v2";
+// Service worker פשוט: האתר נפתח גם בלי אינטרנט (אחרי ביקור ראשון).
+// כשמעלים גרסה חדשה של האתר, אפשר להגדיל את המספר כדי לנקות מטמון ישן.
+const CACHE = "yanai3d-v1";
 
 self.addEventListener("install", () => self.skipWaiting());
 

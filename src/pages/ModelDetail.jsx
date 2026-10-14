@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Copy, ExternalLink, Pencil } from "lucide-react";
 import TopNav from "../components/TopNav.jsx";
@@ -8,25 +8,6 @@ import { useCart } from "../lib/cart.jsx";
 import { useAdmin } from "../lib/admin.jsx";
 import { img } from "../lib/config.js";
 
-function getDynamicPrice(model, text = "", partCount = 1) {
-  if (!model) return 0;
-  const base = Number(model.price || 0);
-
-  if (model.textPricing?.kind === "perChar") {
-    const included = Number(model.textPricing.included || 0);
-    const extra = Math.max(0, String(text || "").length - included);
-    return Number((base + extra * Number(model.textPricing.perChar || 0)).toFixed(2));
-  }
-
-  if (model.partPricing?.kind === "parts") {
-    const unitPrice = Number(model.partPricing.unitPrice ?? base);
-    const qty = Math.max(1, Number(partCount || model.partPricing.min || 1));
-    return Number((unitPrice * qty).toFixed(2));
-  }
-
-  return Number(base.toFixed(2));
-}
-
 export default function ModelDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -34,29 +15,10 @@ export default function ModelDetail() {
   const { isAdmin } = useAdmin();
   const model = PRODUCTS.find((p) => p.id === id);
 
-  const totalColors = Number(model?.colors ?? 1);
-  const labels = Array.isArray(model?.colorLabels) && model.colorLabels.length === 2 ? model.colorLabels : DEFAULT_LABELS;
-  const needsText = model?.textPricing?.kind === "perChar";
-  const needsPartCount = model?.partPricing?.kind === "parts";
-
-  const [selected, setSelected] = useState(() => Array.from({ length: Math.max(0, totalColors) }, () => null));
+  const [selected, setSelected] = useState([]);
   const [text, setText] = useState("");
-  const [partCount, setPartCount] = useState(() => {
-    if (!model?.partPricing) return 1;
-    return Math.max(1, Number(model.partPricing.defaultQty || model.partPricing.min || 1));
-  });
   const [added, setAdded] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    setSelected((prev) => Array.from({ length: Math.max(0, totalColors) }, (_, i) => prev[i] ?? null));
-  }, [totalColors, model?.id]);
-
-  useEffect(() => {
-    if (model?.partPricing) {
-      setPartCount(Math.max(1, Number(model.partPricing.defaultQty || model.partPricing.min || 1)));
-    }
-  }, [model?.id, model?.partPricing]);
 
   if (!model) {
     return (
@@ -70,9 +32,11 @@ export default function ModelDetail() {
     );
   }
 
-  const currentPrice = getDynamicPrice(model, text, partCount);
-  const colorsValid = totalColors === 0 || (selected.length === totalColors && selected.every(Boolean));
-  const canAdd = colorsValid && (!needsText || text.trim().length > 0) && (!needsPartCount || partCount > 0);
+  const n = model.colors;
+  const labels = model.colorLabels?.length === 2 ? model.colorLabels : DEFAULT_LABELS;
+  const offer = model.specialOffer && model.specialOffer.packSize > 1 ? model.specialOffer : null;
+  const colorsValid = selected.length === n && selected.every(Boolean);
+  const canAdd = colorsValid && (n === 1 || text.trim().length > 0);
 
   const setColor = (i, c) =>
     setSelected((prev) => {
@@ -82,17 +46,12 @@ export default function ModelDetail() {
     });
 
   const add = () => {
-    const safeColors = selected.filter(Boolean).map((c, idx) => ({
-      label: totalColors === 2 ? labels[idx] : "צבע",
+    const colors = selected.map((c, i) => ({
+      label: n === 2 ? labels[i] : "צבע",
       name: c.name,
       hex: c.hex,
     }));
-
-    const dynamicPrice = getDynamicPrice(model, text, partCount);
-    const customText = needsText ? text.trim() : "";
-    const extraMeta = needsPartCount ? { partCount: Number(partCount || 0), quantityLabel: model.partPricing?.label || "מספר חלקים" } : {};
-
-    addToCart(model, safeColors, customText, dynamicPrice, extraMeta);
+    addToCart(model, colors, n === 2 ? text.trim() : "");
     setAdded(true);
     setTimeout(() => navigate("/cart"), 400);
   };
@@ -105,22 +64,18 @@ export default function ModelDetail() {
     } catch {}
   };
 
-  const itemPriceLabel = model.priceText && !needsText && !needsPartCount ? model.priceText : currentPrice;
-
   return (
     <div className="min-h-screen pb-24">
       <TopNav back />
       <main className="max-w-md mx-auto px-4 pt-4">
-        <img src={img(model.img, true)} alt={model.name} className="aspect-square w-full object-cover rounded-3xl bg-slate-50 mb-4" />
+        <img src={img(model.img)} alt={model.name} className="aspect-square w-full object-cover rounded-3xl bg-slate-50 mb-4" />
         <h1 className="text-2xl font-bold mb-1">{model.name}</h1>
-        <p className="text-lg text-slate-700 mb-1">מחיר: {itemPriceLabel} ש"ח</p>
-
-        {model.specialOffer && model.specialOffer.packSize > 1 && (
+        <p className="text-lg text-slate-700 mb-1">מחיר: {model.priceText || model.price} ש"ח</p>
+        {offer && (
           <p className="text-sm text-green-600 font-semibold mb-2">
-            מבצע: {model.specialOffer.packSize} ב־{model.specialOffer.packPrice} ₪
+            מבצע: {offer.packSize} ב־{offer.packPrice} ₪
           </p>
         )}
-
         {model.desc && (
           <p className="text-sm text-slate-600 whitespace-pre-line mb-5 mt-2">
             <span className="font-semibold">תיאור: </span>
@@ -157,53 +112,29 @@ export default function ModelDetail() {
           </div>
         )}
 
-        {totalColors > 0 && Array.from({ length: totalColors }).map((_, i) => (
-          <ColorPicker
-            key={i}
-            label={totalColors === 2 ? labels[i] : "צבע"}
-            value={selected[i]}
-            onChange={(c) => setColor(i, c)}
-          />
-        ))}
-
-        {needsText && (
-          <div className="mb-4">
+        {n === 1 && <ColorPicker label="צבע" value={selected[0]} onChange={(c) => setColor(0, c)} />}
+        {n === 2 && (
+          <>
+            <ColorPicker label={labels[0]} value={selected[0]} onChange={(c) => setColor(0, c)} />
+            <ColorPicker label={labels[1]} value={selected[1]} onChange={(c) => setColor(1, c)} />
             <label className="block text-sm font-semibold text-slate-700 mb-2">מה יהיה כתוב על הדגם *</label>
             <input
               value={text}
-              maxLength={Number(model.textPricing?.maxChars || 20)}
+              maxLength={20}
               onChange={(e) => setText(e.target.value)}
               placeholder="הזן טקסט"
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 mb-2"
+              className="w-full border border-slate-200 rounded-lg px-3 py-2 mb-4"
             />
-            <p className="text-xs text-slate-500">{text.length} תווים · מחיר נוכחי: ₪{currentPrice}</p>
-          </div>
-        )}
-
-        {needsPartCount && (
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-slate-700 mb-2">{model.partPricing?.label || "מספר חלקים"} *</label>
-            <input
-              type="number"
-              min={Math.max(1, Number(model.partPricing?.min || 1))}
-              value={partCount}
-              onChange={(e) => setPartCount(Math.max(1, Number(e.target.value || 1)))}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 mb-2"
-            />
-            <p className="text-xs text-slate-500">מחיר נוכחי: ₪{currentPrice}</p>
-          </div>
+          </>
         )}
 
         {!canAdd && (
           <p className="text-xs text-slate-400 mb-2">
-            {needsText && !text.trim()
-              ? "נא להזין טקסט לפני הוספה לעגלה"
-              : totalColors > 0
-                ? "נא לבחור צבע לפני הוספה לעגלה"
-                : "נא להזין פרטים לפני הוספה לעגלה"}
+            {n === 2
+              ? "נא לבחור שני צבעים ולהזין טקסט לפני הוספה לעגלה"
+              : "נא לבחור צבע לפני הוספה לעגלה"}
           </p>
         )}
-
         <button
           disabled={!canAdd}
           onClick={add}
