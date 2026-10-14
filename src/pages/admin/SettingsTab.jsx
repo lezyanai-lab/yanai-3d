@@ -72,7 +72,7 @@ export default function SettingsTab() {
         <ImageUpload value={s.bitLogo} prefix="bit-logo" onChange={(v) => set({ bitLogo: v })} />
       </Field>
 
-      <SaveBar dirty={r.dirty} problem={problem} error={r.error} saved={r.saved} saving={r.saving} onSave={() => r.save(s)} />
+      <SaveBar dirty={r.dirty} problem={problem} error={r.error} saved={r.saved} saving={r.saving} notice={r.notice} onSave={() => r.save(s)} />
     </div>
   );
 }

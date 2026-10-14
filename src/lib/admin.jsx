@@ -5,8 +5,8 @@ const AdminContext = createContext(null);
 const KEY = "yanai3d_admin_token";
 
 // הקובץ נוצר ע"י make-admin.mjs. אם הוא עדיין לא קיים, האתר ממשיך לעבוד כרגיל.
-const mods = import.meta.glob("../data/admin.json", { eager: true });
-const BLOB = mods["../data/admin.json"]?.default;
+const mods = import.meta.glob("../../content/admin.json", { eager: true });
+const BLOB = mods["../../content/admin.json"]?.default;
 export const ADMIN_CONFIGURED = !!BLOB?.data;
 
 export function AdminProvider({ children }) {

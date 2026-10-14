@@ -22,3 +22,8 @@ export async function fileToBase64(file, { max = 1200, quality = 0.85 } = {}) {
   const previewUrl = canvas.toDataURL(png ? "image/png" : "image/jpeg", quality);
   return { base64: previewUrl.split(",")[1], ext: png ? "png" : "jpg", previewUrl };
 }
+
+// תצוגה מקדימה של תמונות שהועלו בסשן הזה, כדי שיופיעו במסך המנהל גם לפני שהפריסה באוויר
+const previews = new Map();
+export const rememberPreview = (name, url) => previews.set(name, url);
+export const previewOf = (name) => previews.get(name) || "";

@@ -21,7 +21,7 @@ export default function FaqTab() {
       [n[i], n[j]] = [n[j], n[i]];
       return n;
     });
-  const add = () => r.setData((p) => [...p, { q: "", a: "", active: true }]);
+  const add = () => r.setData((p) => [...p, { id: `f${Date.now()}`, q: "", a: "", active: true }]);
 
   const problem = items.some((x) => !x.q.trim() || !x.a.trim()) ? "לכל שאלה צריכים להיות גם שאלה וגם תשובה" : "";
 
@@ -30,7 +30,7 @@ export default function FaqTab() {
       <p className="text-sm text-slate-500 mb-4">שאלה שמסומנת כלא פעילה לא תוצג ללקוחות. אפשר להוסיף אימוג'י בתחילת השאלה.</p>
       <div className="space-y-3">
         {items.map((it, i) => (
-          <div key={i} className="p-3 rounded-xl ring-1 ring-slate-100">
+          <div key={it.id || i} className="p-3 rounded-xl ring-1 ring-slate-100">
             <input value={it.q} onChange={(e) => update(i, { q: e.target.value })} placeholder="השאלה" className={`${inputCls} mb-2 font-semibold`} />
             <textarea value={it.a} onChange={(e) => update(i, { a: e.target.value })} placeholder="התשובה" rows={3} className={inputCls} />
             <div className="flex items-center justify-between mt-2">
@@ -66,7 +66,8 @@ export default function FaqTab() {
         error={r.error}
         saved={r.saved}
         saving={r.saving}
-        onSave={() => r.save(items.map((x) => ({ q: x.q.trim(), a: x.a.trim(), active: x.active !== false })))}
+        notice={r.notice}
+        onSave={() => r.save(items.map((x) => ({ id: x.id, q: x.q.trim(), a: x.a.trim(), active: x.active !== false })))}
       />
     </div>
   );

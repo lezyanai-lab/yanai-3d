@@ -21,7 +21,7 @@ export default function ColorsTab() {
       [n[i], n[j]] = [n[j], n[i]];
       return n;
     });
-  const add = () => r.setData((p) => [...p, { name: "", hex: "#888888", inStock: true }]);
+  const add = () => r.setData((p) => [...p, { id: `c${Date.now()}`, name: "", hex: "#888888", inStock: true }]);
 
   const names = colors.map((c) => c.name.trim());
   const problem = colors.some((c) => !c.name.trim())
@@ -39,7 +39,7 @@ export default function ColorsTab() {
       </p>
       <div className="space-y-2">
         {colors.map((c, i) => (
-          <div key={i} className="flex items-center gap-2 p-2 rounded-xl ring-1 ring-slate-100">
+          <div key={c.id || i} className="flex items-center gap-2 p-2 rounded-xl ring-1 ring-slate-100">
             <input
               type="color"
               value={HEX.test(c.hex) ? c.hex.toLowerCase() : "#888888"}
@@ -93,7 +93,8 @@ export default function ColorsTab() {
         error={r.error}
         saved={r.saved}
         saving={r.saving}
-        onSave={() => r.save(colors.map((c) => ({ name: c.name.trim(), hex: c.hex, inStock: !!c.inStock })))}
+        notice={r.notice}
+        onSave={() => r.save(colors.map((c) => ({ id: c.id, name: c.name.trim(), hex: c.hex, inStock: !!c.inStock })))}
       />
     </div>
   );

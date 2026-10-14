@@ -1,60 +1,72 @@
 [
   {
+    "id": "c01",
     "name": "שחור",
     "hex": "#1a1a1a",
     "inStock": true
   },
   {
+    "id": "c02",
     "name": "לבן",
     "hex": "#f3f4f6",
     "inStock": true
   },
   {
+    "id": "c03",
     "name": "כחול",
     "hex": "#2563eb",
     "inStock": true
   },
   {
+    "id": "c04",
     "name": "צהוב",
     "hex": "#eab308",
     "inStock": true
   },
   {
+    "id": "c05",
     "name": "חום",
     "hex": "#795548",
     "inStock": true
   },
   {
+    "id": "c06",
     "name": "אדום",
     "hex": "#dc2626",
     "inStock": true
   },
   {
+    "id": "c07",
     "name": "אפור",
     "hex": "#707070",
     "inStock": true
   },
   {
+    "id": "c08",
     "name": "כתום",
     "hex": "#F8903F",
     "inStock": true
   },
   {
+    "id": "c09",
     "name": "ירוק",
     "hex": "#16a34a",
     "inStock": true
   },
   {
+    "id": "c10",
     "name": "ורוד",
     "hex": "#ec4899",
     "inStock": true
   },
   {
+    "id": "c11",
     "name": "תכלת",
     "hex": "#55B9E5",
     "inStock": true
   },
   {
+    "id": "c12",
     "name": "סגול זוהר",
     "hex": "#8A2BE2",
     "inStock": true

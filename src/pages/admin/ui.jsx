@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Loader2, Upload } from "lucide-react";
 import { useAdmin } from "../../lib/admin.jsx";
 import { uploadBinary } from "../../lib/github.js";
-import { fileToBase64 } from "../../lib/image.js";
+import { fileToBase64, rememberPreview, previewOf } from "../../lib/image.js";
 import { img } from "../../lib/config.js";
 
 export const inputCls = "w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white";
@@ -26,7 +26,7 @@ export function Field({ label, children, hint }) {
 }
 
 // פס שמירה קבוע בתחתית המסך
-export function SaveBar({ dirty, problem, error, saved, saving, onSave }) {
+export function SaveBar({ dirty, problem, error, saved, saving, notice, onSave }) {
   return (
     <div className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-100 z-20">
       <div className="max-w-2xl mx-auto p-4">
@@ -35,6 +35,7 @@ export function SaveBar({ dirty, problem, error, saved, saving, onSave }) {
         {saved && !dirty && (
           <p className="text-xs text-green-700 mb-2">✅ נשמר! השינוי יופיע באתר בעוד כדקה-שתיים.</p>
         )}
+        {notice && !dirty && <p className="text-xs text-amber-700 mb-2">{notice}</p>}
         <button
           onClick={onSave}
           disabled={!dirty || !!problem || saving}
@@ -64,6 +65,7 @@ export function ImageUpload({ value, onChange, prefix = "img" }) {
       const { base64, ext, previewUrl } = await fileToBase64(f);
       const name = `${prefix}-${Date.now()}.${ext}`;
       await uploadBinary(token, `public/images/${name}`, base64);
+      rememberPreview(name, previewUrl);
       setPreview(previewUrl);
       onChange(name);
     } catch (e2) {
@@ -73,7 +75,7 @@ export function ImageUpload({ value, onChange, prefix = "img" }) {
     }
   };
 
-  const src = preview || (value ? img(value) : "");
+  const src = preview || previewOf(value) || (value ? img(value) : "");
   return (
     <div className="flex items-center gap-3">
       <div className="w-20 h-20 rounded-xl bg-slate-50 ring-1 ring-slate-100 overflow-hidden flex items-center justify-center shrink-0">

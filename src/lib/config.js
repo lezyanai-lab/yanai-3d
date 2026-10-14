@@ -1,5 +1,5 @@
 // ההגדרות נערכות ממסך המנהל (הגדרות ← הגדרות אתר) ונשמרות ב-settings.json
-import settings from "../data/settings.json";
+import settings from "../../content/settings.json";
 
 export const SETTINGS = settings;
 export const WHATSAPP = settings.whatsapp;

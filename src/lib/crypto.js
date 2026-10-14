@@ -1,5 +1,5 @@
 // פענוח הטוקן של GitHub באמצעות אימייל + סיסמה (AES-GCM + PBKDF2).
-// הקובץ המוצפן (src/data/admin.json) נוצר במחשב של המנהל באמצעות make-admin.mjs.
+// הקובץ המוצפן (content/admin.json) נוצר במחשב של המנהל באמצעות make-admin.mjs.
 const b64d = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 
 export async function decryptToken(blob, email, password) {

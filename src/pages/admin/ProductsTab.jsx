@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Eye, EyeOff, Pencil, Plus, Trash2 } from "lucid
 import { FILES } from "../../lib/github.js";
 import { useRepoJson } from "../../lib/useRepoJson.js";
 import { img } from "../../lib/config.js";
+import { previewOf } from "../../lib/image.js";
 import { DEFAULT_LABELS } from "../../data/products.js";
 import { Field, ImageUpload, SaveBar, Spinner, inputCls } from "./ui.jsx";
 
@@ -94,7 +95,7 @@ export default function ProductsTab({ openId }) {
             <div key={p.id} className={`rounded-xl ring-1 ${isOpen ? "ring-slate-300" : "ring-slate-100"}`}>
               <div className="flex items-center gap-3 p-2">
                 <div className="w-12 h-12 rounded-lg bg-slate-50 overflow-hidden shrink-0">
-                  {p.img && <img src={img(p.img)} alt="" className={`w-full h-full object-cover ${p.hidden ? "opacity-40" : ""}`} />}
+                  {p.img && <img src={previewOf(p.img) || img(p.img)} alt="" className={`w-full h-full object-cover ${p.hidden ? "opacity-40" : ""}`} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-semibold truncate ${p.hidden ? "text-slate-400" : ""}`}>{p.name || "דגם חדש"}</p>
@@ -230,6 +231,7 @@ export default function ProductsTab({ openId }) {
         error={r.error}
         saved={r.saved}
         saving={r.saving}
+        notice={r.notice}
         onSave={() => r.save(clean())}
       />
     </div>

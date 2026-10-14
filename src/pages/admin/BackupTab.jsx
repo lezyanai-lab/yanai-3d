@@ -45,7 +45,7 @@ export default function BackupTab() {
         <p className="font-bold mb-1">ביטול שינוי שנעשה בטעות</p>
         <p>
           כל שמירה נרשמת ב-GitHub בהיסטוריה. כדי לחזור לגרסה קודמת: ב-GitHub היכנס לקובץ הרלוונטי בתיקייה
-          <span dir="ltr"> src/data</span>, לחץ על History, ובחר Revert בשינוי הלא רצוי.
+          <span dir="ltr"> content</span>, לחץ על History, ובחר Revert בשינוי הלא רצוי.
         </p>
       </div>
     </div>

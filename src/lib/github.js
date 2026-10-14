@@ -1,11 +1,14 @@
 // עדכון קבצי האתר ישירות ב-GitHub מתוך מסך המנהל.
 // הטוקן מתקבל מפענוח הקובץ המוצפן (אימייל + סיסמה) ולא נמצא בקוד.
+import { ensureIds } from "./merge.js";
+
 export const REPO = { owner: "lezyanai-lab", repo: "yanai-3d", branch: "main" };
+// קבצי הנתונים יושבים בתיקייה content (ולא ב-src), כדי שעדכוני קוד לעולם לא ידרסו אותם
 export const FILES = {
-  products: "src/data/products.json",
-  faq: "src/data/faq.json",
-  colors: "src/data/colors.json",
-  settings: "src/data/settings.json",
+  products: "content/products.json",
+  faq: "content/faq.json",
+  colors: "content/colors.json",
+  settings: "content/settings.json",
 };
 
 const API = "https://api.github.com";
@@ -31,11 +34,13 @@ export async function getJson(token, path) {
   const res = await fetch(`${base}/${path}?ref=${REPO.branch}`, { headers: headers(token), cache: "no-store" });
   if (!res.ok) throw authError(res.status) || new Error(`הטעינה נכשלה (${res.status})`);
   const json = await res.json();
-  return { sha: json.sha, data: JSON.parse(dec(json.content)) };
+  return { sha: json.sha, data: ensureIds(JSON.parse(dec(json.content))) };
 }
 
-async function putJson(token, path, data, sha, message) {
-  return fetch(`${base}/${path}`, {
+// שמירה עם הגנה: אם הקובץ השתנה בינתיים GitHub דוחה (409/422) ואנחנו לא דורסים בשקט.
+// מי שקורא (useRepoJson) טוען את הגרסה העדכנית, ממזג ומנסה שוב.
+export async function saveJson(token, path, data, sha, message = "עדכון ממסך המנהל") {
+  const res = await fetch(`${base}/${path}`, {
     method: "PUT",
     headers: { ...headers(token), "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -45,13 +50,10 @@ async function putJson(token, path, data, sha, message) {
       branch: REPO.branch,
     }),
   });
-}
-
-export async function saveJson(token, path, data, sha, message = "עדכון ממסך המנהל") {
-  let res = await putJson(token, path, data, sha, message);
   if (res.status === 409 || res.status === 422) {
-    const fresh = await getJson(token, path); // הקובץ השתנה בינתיים - sha עדכני וניסיון נוסף
-    res = await putJson(token, path, data, fresh.sha, message);
+    const err = new Error("הקובץ עודכן בינתיים ממקום אחר");
+    err.code = "conflict";
+    throw err;
   }
   if (!res.ok) throw authError(res.status) || new Error(`השמירה נכשלה (${res.status})`);
   return (await res.json()).content.sha;
