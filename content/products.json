@@ -6,7 +6,7 @@
     "priceText": "",
     "desc": "קליקר חנוכיה לחנוכה!🍩🕎",
     "img": "p-1791811000409.jpg",
-    "colors": 1,
+    "colors": 0,
     "colorLabels": [],
     "link": "",
     "specialOffer": null,
@@ -52,7 +52,18 @@
     ],
     "link": "https://makerworld.com/models/3141473?appSharePlatform=copy",
     "specialOffer": null,
-    "hidden": false
+    "hidden": false,
+    "pricing": {
+      "type": "perChar",
+      "included": 4,
+      "extra": 1
+    },
+    "textField": {
+      "label": "מה יהיה כתוב על הדגם",
+      "placeholder": "הזן שם",
+      "maxChars": 20,
+      "required": true
+    }
   },
   {
     "id": "p05",
@@ -68,7 +79,18 @@
     ],
     "link": "https://makerworld.com/models/3133512?appSharePlatform=copy",
     "specialOffer": null,
-    "hidden": false
+    "hidden": false,
+    "pricing": {
+      "type": "perChar",
+      "included": 4,
+      "extra": 2
+    },
+    "textField": {
+      "label": "מה יהיה כתוב על הדגם",
+      "placeholder": "הזן אותיות",
+      "maxChars": 20,
+      "required": true
+    }
   },
   {
     "id": "p06",
@@ -107,7 +129,16 @@
     "colorLabels": [],
     "link": "https://makerworld.com/models/2207416?appSharePlatform=whatsapp",
     "specialOffer": null,
-    "hidden": false
+    "hidden": false,
+    "pricing": {
+      "type": "quote"
+    },
+    "textField": {
+      "label": "מספר החלק בלגו",
+      "placeholder": "למשל 3001",
+      "maxChars": 30,
+      "required": true
+    }
   },
   {
     "id": "p09",

@@ -8,13 +8,16 @@ function buildMessage({ name, phone, notes, items }) {
   const lines = ["שלום ינאי!", "", `שם מלא: ${name}`, `טלפון: ${phone}`, "", "ברצוני להזמין:", ""];
   items.forEach((it) => {
     lines.push(`שם הדגם: ${it.modelName}`);
-    lines.push(`מחיר: ${it.price} ₪`);
+    lines.push(it.quote ? "מחיר: ייקבע בפרטי" : `מחיר: ${it.price} ₪`);
     if (it.colors.length === 2) {
       lines.push(`צבע בסיס: ${it.colors[0].name}`);
       lines.push(`צבע טקסט: ${it.colors[1].name}`);
-      lines.push(`מה יהיה כתוב על הדגם: ${it.customText}`);
-    } else {
+    } else if (it.colors.length === 1) {
       lines.push(`צבע: ${it.colors[0]?.name ?? ""}`);
+    }
+    if (it.customText) {
+      lines.push(`${it.textLabel || "טקסט"}: ${it.customText}`);
+      if (!it.quote && it.chars) lines.push(`מספר תווים: ${it.chars}`);
     }
     if (it.quantity > 1) lines.push(`כמות: ${it.quantity}`);
     if (it.specialOffer?.packSize > 1) lines.push(`מבצע: ${it.specialOffer.packSize} ב־${it.specialOffer.packPrice} ₪`);
@@ -26,7 +29,7 @@ function buildMessage({ name, phone, notes, items }) {
 }
 
 export default function Checkout() {
-  const { items, total, clearCart } = useCart();
+  const { items, total, hasQuote, clearCart } = useCart();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -77,7 +80,7 @@ export default function Checkout() {
           ))}
           <div className="flex justify-between font-bold border-t border-slate-100 pt-2 mt-2">
             <span>סה"כ</span>
-            <span>₪{total}</span>
+            <span>₪{total}{hasQuote ? " + פריטים שייקבעו בפרטי" : ""}</span>
           </div>
         </div>
 

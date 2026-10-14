@@ -1,3 +1,4 @@
+import { unitPrice, isQuote, textFieldOf, countChars } from "./product.js";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const CartContext = createContext(null);
@@ -5,6 +6,7 @@ const KEY = "yanai3d_cart";
 
 // מחיר שורה בעגלה, כולל מבצע חבילה (למשל 5 ב-35)
 export function itemTotal(i) {
+  if (i.quote) return 0;
   const o = i.specialOffer;
   if (o && o.packSize > 1 && o.packPrice > 0) {
     const packs = Math.floor(i.quantity / o.packSize);
@@ -40,7 +42,10 @@ export function CartProvider({ children }) {
           key,
           modelId: model.id,
           modelName: model.name,
-          price: model.price,
+          price: unitPrice(model, customText),
+          quote: isQuote(model),
+          textLabel: textFieldOf(model)?.label || "",
+          chars: countChars(customText),
           img: model.img,
           colors,
           customText,
@@ -60,10 +65,11 @@ export function CartProvider({ children }) {
 
   const count = items.reduce((s, i) => s + i.quantity, 0);
   const total = items.reduce((s, i) => s + itemTotal(i), 0);
+  const hasQuote = items.some((i) => i.quote);
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, count, total }}
+      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, count, total, hasQuote }}
     >
       {children}
     </CartContext.Provider>

@@ -3,10 +3,11 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { Copy, ExternalLink, Pencil } from "lucide-react";
 import TopNav from "../components/TopNav.jsx";
 import ColorPicker from "../components/ColorPicker.jsx";
-import { PRODUCTS, DEFAULT_LABELS } from "../data/products.js";
+import { PRODUCTS } from "../data/products.js";
 import { useCart } from "../lib/cart.jsx";
 import { useAdmin } from "../lib/admin.jsx";
 import { img } from "../lib/config.js";
+import { textFieldOf, pricingOf, unitPrice, isQuote, countChars, colorCount, colorLabelsOf } from "../lib/product.js";
 
 export default function ModelDetail() {
   const { id } = useParams();
@@ -32,11 +33,17 @@ export default function ModelDetail() {
     );
   }
 
-  const n = model.colors;
-  const labels = model.colorLabels?.length === 2 ? model.colorLabels : DEFAULT_LABELS;
+  const n = colorCount(model);
+  const labels = colorLabelsOf(model);
+  const tf = textFieldOf(model);
+  const pr = pricingOf(model);
+  const quote = isQuote(model);
   const offer = model.specialOffer && model.specialOffer.packSize > 1 ? model.specialOffer : null;
-  const colorsValid = selected.length === n && selected.every(Boolean);
-  const canAdd = colorsValid && (n === 1 || text.trim().length > 0);
+  const colorsValid = selected.length >= n && selected.slice(0, n).every(Boolean);
+  const textOk = !tf || !tf.required || text.trim().length > 0;
+  const canAdd = colorsValid && textOk;
+  const chars = countChars(text);
+  const price = unitPrice(model, text);
 
   const setColor = (i, c) =>
     setSelected((prev) => {
@@ -46,12 +53,12 @@ export default function ModelDetail() {
     });
 
   const add = () => {
-    const colors = selected.map((c, i) => ({
-      label: n === 2 ? labels[i] : "צבע",
+    const colors = selected.slice(0, n).map((c, i) => ({
+      label: labels[i],
       name: c.name,
       hex: c.hex,
     }));
-    addToCart(model, colors, n === 2 ? text.trim() : "");
+    addToCart(model, colors, tf ? text.trim() : "");
     setAdded(true);
     setTimeout(() => navigate("/cart"), 400);
   };
@@ -70,7 +77,9 @@ export default function ModelDetail() {
       <main className="max-w-md mx-auto px-4 pt-4">
         <img src={img(model.img)} alt={model.name} className="aspect-square w-full object-cover rounded-3xl bg-slate-50 mb-4" />
         <h1 className="text-2xl font-bold mb-1">{model.name}</h1>
-        <p className="text-lg text-slate-700 mb-1">מחיר: {model.priceText || model.price} ש"ח</p>
+        <p className="text-lg text-slate-700 mb-1">
+          {quote ? "המחיר ייקבע בפרטי לפי החלק" : `מחיר: ${model.priceText || model.price} ש"ח`}
+        </p>
         {offer && (
           <p className="text-sm text-green-600 font-semibold mb-2">
             מבצע: {offer.packSize} ב־{offer.packPrice} ₪
@@ -112,27 +121,32 @@ export default function ModelDetail() {
           </div>
         )}
 
-        {n === 1 && <ColorPicker label="צבע" value={selected[0]} onChange={(c) => setColor(0, c)} />}
-        {n === 2 && (
+        {Array.from({ length: n }).map((_, i) => (
+          <ColorPicker key={i} label={labels[i]} value={selected[i]} onChange={(c) => setColor(i, c)} />
+        ))}
+        {tf && (
           <>
-            <ColorPicker label={labels[0]} value={selected[0]} onChange={(c) => setColor(0, c)} />
-            <ColorPicker label={labels[1]} value={selected[1]} onChange={(c) => setColor(1, c)} />
-            <label className="block text-sm font-semibold text-slate-700 mb-2">מה יהיה כתוב על הדגם *</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              {tf.label}{tf.required ? " *" : ""}
+            </label>
             <input
               value={text}
-              maxLength={20}
+              maxLength={tf.maxChars}
               onChange={(e) => setText(e.target.value)}
-              placeholder="הזן טקסט"
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 mb-4"
+              placeholder={tf.placeholder}
+              className="w-full border border-slate-200 rounded-lg px-3 py-2 mb-2"
             />
+            {pr.type === "perChar" && (
+              <p className="text-sm text-slate-700 mb-4">
+                {chars} תווים · מחיר ליחידה: <span className="font-bold">₪{price}</span>
+              </p>
+            )}
           </>
         )}
 
         {!canAdd && (
           <p className="text-xs text-slate-400 mb-2">
-            {n === 2
-              ? "נא לבחור שני צבעים ולהזין טקסט לפני הוספה לעגלה"
-              : "נא לבחור צבע לפני הוספה לעגלה"}
+            {!colorsValid && textOk ? "נא לבחור צבע לפני הוספה לעגלה" : !colorsValid ? "נא לבחור צבעים ולמלא את השדה לפני הוספה לעגלה" : "נא למלא את השדה לפני הוספה לעגלה"}
           </p>
         )}
         <button

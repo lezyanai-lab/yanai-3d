@@ -5,7 +5,7 @@ import { useCart, itemTotal } from "../lib/cart.jsx";
 import { img } from "../lib/config.js";
 
 export default function Cart() {
-  const { items, removeFromCart, updateQuantity, total } = useCart();
+  const { items, removeFromCart, updateQuantity, total, hasQuote } = useCart();
 
   if (items.length === 0) {
     return (
@@ -31,7 +31,7 @@ export default function Cart() {
               <img src={img(it.img)} alt="" className="w-20 h-20 rounded-xl object-cover bg-slate-50" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm">{it.modelName}</p>
-                <p className="text-xs text-slate-500">₪{it.price} ליחידה</p>
+                <p className="text-xs text-slate-500">{it.quote ? "המחיר ייקבע בפרטי" : `₪${it.price} ליחידה`}</p>
                 {it.specialOffer?.packSize > 1 && (
                   <p className="text-xs text-green-600">
                     מבצע: {it.specialOffer.packSize} ב־{it.specialOffer.packPrice} ₪
@@ -43,7 +43,11 @@ export default function Cart() {
                     {c.label}: {c.name}
                   </p>
                 ))}
-                {it.customText && <p className="text-xs text-slate-600">טקסט: {it.customText}</p>}
+                {it.customText && (
+                  <p className="text-xs text-slate-600">
+                    {it.textLabel || "טקסט"}: {it.customText}{!it.quote && it.chars ? ` (${it.chars} תווים)` : ""}
+                  </p>
+                )}
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center gap-2">
                     <button onClick={() => updateQuantity(it.key, -1)} className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center">
@@ -55,7 +59,7 @@ export default function Cart() {
                     </button>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="font-bold text-sm">₪{itemTotal(it)}</span>
+                    <span className="font-bold text-sm">{it.quote ? "ייקבע בפרטי" : `₪${itemTotal(it)}`}</span>
                     <button onClick={() => removeFromCart(it.key)} aria-label="הסר">
                       <Trash2 className="w-4 h-4 text-slate-400" />
                     </button>
@@ -71,7 +75,7 @@ export default function Cart() {
         <div className="max-w-md mx-auto p-4">
           <div className="flex justify-between font-bold mb-3">
             <span>סה"כ להזמנה</span>
-            <span>₪{total}</span>
+            <span>₪{total}{hasQuote ? " + פריטים שייקבעו בפרטי" : ""}</span>
           </div>
           <Link to="/checkout" className="block text-center bg-slate-900 text-white rounded-xl py-3 font-bold">
             המשך להזמנה

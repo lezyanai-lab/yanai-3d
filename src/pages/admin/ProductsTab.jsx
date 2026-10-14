@@ -4,7 +4,7 @@ import { FILES } from "../../lib/github.js";
 import { useRepoJson } from "../../lib/useRepoJson.js";
 import { img } from "../../lib/config.js";
 import { previewOf } from "../../lib/image.js";
-import { DEFAULT_LABELS } from "../../data/products.js";
+import { DEFAULT_TEXT, colorCount, colorLabelsOf } from "../../lib/product.js";
 import { Field, ImageUpload, SaveBar, Spinner, inputCls } from "./ui.jsx";
 
 const emptyProduct = () => ({
@@ -25,8 +25,10 @@ function validate(list) {
   for (const p of list) {
     const label = p.name.trim() || "דגם חדש";
     if (!p.name.trim()) return "לכל דגם חייב להיות שם";
-    if (!(Number(p.price) > 0)) return `"${label}": צריך להזין מחיר גדול מ-0`;
-    if (p.colors === 2 && p.colorLabels.some((l) => !l.trim())) return `"${label}": חסר שם לאחד הצבעים`;
+    const quote = p.pricing?.type === "quote";
+    if (!quote && !(Number(p.price) > 0)) return `"${label}": צריך להזין מחיר גדול מ-0`;
+    if (colorCount(p) > 1 && colorLabelsOf(p).some((l) => !String(l).trim())) return `"${label}": חסר שם לאחד הצבעים`;
+    if (p.pricing?.type === "perChar" && !p.textField) return `"${label}": תמחור לפי תווים דורש שדה טקסט`;
     if (p.specialOffer && !(p.specialOffer.packSize >= 2 && p.specialOffer.packPrice > 0))
       return `"${label}": במבצע חבילה צריך כמות של 2 ומעלה ומחיר גדול מ-0`;
   }
@@ -70,7 +72,15 @@ export default function ProductsTab({ openId }) {
       priceText: p.priceText.trim(),
       desc: p.desc,
       link: p.link.trim(),
-      colorLabels: p.colors === 2 ? p.colorLabels.map((l) => l.trim()) : [],
+      colors: colorCount(p),
+      colorLabels: colorLabelsOf(p).map((l) => String(l).trim()),
+      textField: p.textField ? { ...DEFAULT_TEXT, ...p.textField, maxChars: Number(p.textField.maxChars) || 20 } : null,
+      pricing:
+        p.pricing?.type === "perChar"
+          ? { type: "perChar", included: Number(p.pricing.included) || 0, extra: Number(p.pricing.extra) || 0 }
+          : p.pricing?.type === "quote"
+          ? { type: "quote" }
+          : { type: "fixed" },
       specialOffer: p.specialOffer
         ? { packSize: Number(p.specialOffer.packSize), packPrice: Number(p.specialOffer.packPrice) }
         : null,
@@ -154,27 +164,28 @@ export default function ProductsTab({ openId }) {
                     <ImageUpload value={p.img} prefix="p" onChange={(v) => update(p.id, { img: v })} />
                   </Field>
 
-                  <Field label="אפשרויות צבע">
+                  <Field label="כמה צבעים הלקוח בוחר" hint="0 = אין בחירת צבע (לדגם עם צבע קבוע)">
                     <select
-                      value={p.colors}
+                      value={colorCount(p)}
                       onChange={(e) => {
                         const n = Number(e.target.value);
-                        update(p.id, { colors: n, colorLabels: n === 2 ? (p.colorLabels.length === 2 ? p.colorLabels : [...DEFAULT_LABELS]) : [] });
+                        update(p.id, { colors: n, colorLabels: Array.from({ length: n }, (_, i) => p.colorLabels?.[i] || "") });
                       }}
                       className={inputCls}
                     >
-                      <option value={1}>צבע אחד</option>
-                      <option value={2}>שני צבעים + טקסט אישי (למשל שם על מחזיק מפתחות)</option>
+                      {[0, 1, 2, 3, 4, 5, 6].map((n) => (
+                        <option key={n} value={n}>{n === 0 ? "0 - ללא בחירת צבע" : n === 1 ? "צבע אחד" : `${n} צבעים`}</option>
+                      ))}
                     </select>
                   </Field>
-                  {p.colors === 2 && (
+                  {colorCount(p) > 1 && (
                     <div className="grid grid-cols-2 gap-3">
-                      {[0, 1].map((k) => (
+                      {Array.from({ length: colorCount(p) }).map((_, k) => (
                         <Field key={k} label={`שם צבע ${k + 1}`}>
                           <input
-                            value={p.colorLabels[k] ?? ""}
+                            value={p.colorLabels?.[k] ?? colorLabelsOf(p)[k]}
                             onChange={(e) => {
-                              const l = [...p.colorLabels];
+                              const l = Array.from({ length: colorCount(p) }, (_, i) => p.colorLabels?.[i] ?? colorLabelsOf(p)[i]);
                               l[k] = e.target.value;
                               update(p.id, { colorLabels: l });
                             }}
@@ -182,6 +193,62 @@ export default function ProductsTab({ openId }) {
                           />
                         </Field>
                       ))}
+                    </div>
+                  )}
+
+                  <div className="mb-3">
+                    <label className="flex items-center gap-2 text-sm font-semibold mb-2">
+                      <input
+                        type="checkbox"
+                        checked={!!p.textField}
+                        onChange={(e) => update(p.id, { textField: e.target.checked ? { ...DEFAULT_TEXT } : null, ...(e.target.checked ? {} : { pricing: { type: p.pricing?.type === "quote" ? "quote" : "fixed" } }) })}
+                      />
+                      שדה טקסט ללקוח (שם, אותיות, מספר חלק...)
+                    </label>
+                    {p.textField && (
+                      <div className="grid grid-cols-2 gap-3">
+                        <Field label="כותרת השדה">
+                          <input value={p.textField.label} onChange={(e) => update(p.id, { textField: { ...p.textField, label: e.target.value } })} className={inputCls} />
+                        </Field>
+                        <Field label="טקסט לדוגמה">
+                          <input value={p.textField.placeholder} onChange={(e) => update(p.id, { textField: { ...p.textField, placeholder: e.target.value } })} className={inputCls} />
+                        </Field>
+                        <Field label="מקסימום תווים">
+                          <input type="number" min="1" value={p.textField.maxChars} onChange={(e) => update(p.id, { textField: { ...p.textField, maxChars: Number(e.target.value) } })} className={inputCls} />
+                        </Field>
+                        <label className="flex items-center gap-2 text-sm mt-6">
+                          <input type="checkbox" checked={!!p.textField.required} onChange={(e) => update(p.id, { textField: { ...p.textField, required: e.target.checked } })} />
+                          חובה למלא
+                        </label>
+                      </div>
+                    )}
+                  </div>
+
+                  <Field label="סוג תמחור">
+                    <select
+                      value={p.pricing?.type || "fixed"}
+                      onChange={(e) => {
+                        const t = e.target.value;
+                        update(p.id, {
+                          pricing: t === "perChar" ? { type: "perChar", included: p.pricing?.included ?? 0, extra: p.pricing?.extra ?? 1 } : { type: t },
+                          ...(t !== "fixed" && !p.textField ? { textField: { ...DEFAULT_TEXT } } : {}),
+                        });
+                      }}
+                      className={inputCls}
+                    >
+                      <option value="fixed">מחיר קבוע</option>
+                      <option value="perChar">לפי מספר תווים (אוטומטי)</option>
+                      <option value="quote">המחיר ייקבע בפרטי (לא מוצג ללקוח)</option>
+                    </select>
+                  </Field>
+                  {p.pricing?.type === "perChar" && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="תווים שכלולים במחיר הבסיס" hint="המחיר שלמעלה הוא מחיר הבסיס">
+                        <input type="number" min="0" value={p.pricing.included} onChange={(e) => update(p.id, { pricing: { ...p.pricing, included: Number(e.target.value) } })} className={inputCls} />
+                      </Field>
+                      <Field label="מחיר לכל תו נוסף (₪)">
+                        <input type="number" min="0" step="0.5" value={p.pricing.extra} onChange={(e) => update(p.id, { pricing: { ...p.pricing, extra: Number(e.target.value) } })} className={inputCls} />
+                      </Field>
                     </div>
                   )}
 
