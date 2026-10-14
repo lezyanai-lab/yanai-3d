@@ -31,7 +31,7 @@ export default function Cart() {
               <img src={img(it.img)} alt="" className="w-20 h-20 rounded-xl object-cover bg-slate-50" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm">{it.modelName}</p>
-                <p className="text-xs text-slate-500">{it.quote ? "המחיר ייקבע בפרטי" : `₪${it.price} ליחידה`}</p>
+                <p className="text-xs text-slate-500">{it.quote ? "המחיר ייקבע בפרטי" : `₪${it.price} ליחידה${it.chars && it.perChar ? ` (${it.chars} תווים)` : ""}`}</p>
                 {it.specialOffer?.packSize > 1 && (
                   <p className="text-xs text-green-600">
                     מבצע: {it.specialOffer.packSize} ב־{it.specialOffer.packPrice} ₪

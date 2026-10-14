@@ -1,3 +1,4 @@
+import { sortPrice } from "../lib/product.js";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import TopNav from "../components/TopNav.jsx";
@@ -22,8 +23,8 @@ function sortProducts(list, mode) {
   switch (mode) {
     case "az": return a.sort((x, y) => x.name.localeCompare(y.name, "he"));
     case "za": return a.sort((x, y) => y.name.localeCompare(x.name, "he"));
-    case "cheap": return a.sort((x, y) => x.price - y.price);
-    case "exp": return a.sort((x, y) => y.price - x.price);
+    case "cheap": return a.sort((x, y) => sortPrice(x) - sortPrice(y));
+    case "exp": return a.sort((x, y) => sortPrice(y) - sortPrice(x));
     case "old": return a.reverse();
     default: return a; // none / new = סדר המקור (חדש לישן)
   }

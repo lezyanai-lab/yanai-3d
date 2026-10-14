@@ -36,3 +36,10 @@ export function colorLabelsOf(m) {
   const given = Array.isArray(m.colorLabels) ? m.colorLabels : [];
   return Array.from({ length: n }, (_, i) => given[i] || (n === 1 ? "צבע" : n === 2 ? ["צבע בסיס", "צבע טקסט"][i] : `צבע ${i + 1}`));
 }
+
+const WORDS = { 1: "שקל אחד", 2: "שני שקלים" };
+export function rateText(m) {
+  const e = Number(pricingOf(m).extra) || 0;
+  return WORDS[e] || `${e} שקלים`;
+}
+export const sortPrice = (m) => (pricingOf(m).type === "perChar" ? Number(pricingOf(m).extra) || 0 : Number(m.price));

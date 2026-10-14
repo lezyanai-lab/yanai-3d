@@ -7,7 +7,7 @@ import { PRODUCTS } from "../data/products.js";
 import { useCart } from "../lib/cart.jsx";
 import { useAdmin } from "../lib/admin.jsx";
 import { img } from "../lib/config.js";
-import { textFieldOf, pricingOf, unitPrice, isQuote, countChars, colorCount, colorLabelsOf } from "../lib/product.js";
+import { textFieldOf, pricingOf, unitPrice, isQuote, countChars, colorCount, colorLabelsOf, rateText } from "../lib/product.js";
 
 export default function ModelDetail() {
   const { id } = useParams();
@@ -78,7 +78,11 @@ export default function ModelDetail() {
         <img src={img(model.img)} alt={model.name} className="aspect-square w-full object-cover rounded-3xl bg-slate-50 mb-4" />
         <h1 className="text-2xl font-bold mb-1">{model.name}</h1>
         <p className="text-lg text-slate-700 mb-1">
-          {quote ? "המחיר ייקבע בפרטי לפי החלק" : `מחיר: ${model.priceText || model.price} ש"ח`}
+          {quote
+            ? "המחיר ייקבע בפרטי לפי החלק"
+            : pr.type === "perChar"
+            ? `מחיר לאות: ${rateText(model)}`
+            : `מחיר: ${model.priceText || model.price} ש"ח`}
         </p>
         {offer && (
           <p className="text-sm text-green-600 font-semibold mb-2">
@@ -138,7 +142,7 @@ export default function ModelDetail() {
             />
             {pr.type === "perChar" && (
               <p className="text-sm text-slate-700 mb-4">
-                {chars} תווים · מחיר ליחידה: <span className="font-bold">₪{price}</span>
+                {chars} תווים · סה"כ ליחידה: <span className="font-bold">₪{price}</span>
               </p>
             )}
           </>

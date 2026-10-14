@@ -25,8 +25,8 @@ function validate(list) {
   for (const p of list) {
     const label = p.name.trim() || "דגם חדש";
     if (!p.name.trim()) return "לכל דגם חייב להיות שם";
-    const quote = p.pricing?.type === "quote";
-    if (!quote && !(Number(p.price) > 0)) return `"${label}": צריך להזין מחיר גדול מ-0`;
+    const noPrice = p.pricing?.type === "quote" || p.pricing?.type === "perChar";
+    if (!noPrice && !(Number(p.price) > 0)) return `"${label}": צריך להזין מחיר גדול מ-0`;
     if (colorCount(p) > 1 && colorLabelsOf(p).some((l) => !String(l).trim())) return `"${label}": חסר שם לאחד הצבעים`;
     if (p.pricing?.type === "perChar" && !p.textField) return `"${label}": תמחור לפי תווים דורש שדה טקסט`;
     if (p.specialOffer && !(p.specialOffer.packSize >= 2 && p.specialOffer.packPrice > 0))
@@ -110,7 +110,7 @@ export default function ProductsTab({ openId }) {
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-semibold truncate ${p.hidden ? "text-slate-400" : ""}`}>{p.name || "דגם חדש"}</p>
                   <p className="text-xs text-slate-500">
-                    ₪{p.priceText || p.price}
+                    {p.pricing?.type === "perChar" ? `₪${p.pricing.extra} לתו` : p.pricing?.type === "quote" ? "ייקבע בפרטי" : `₪${p.priceText || p.price}`}
                     {p.hidden && " · מוסתר"}
                   </p>
                 </div>
@@ -243,7 +243,7 @@ export default function ProductsTab({ openId }) {
                   </Field>
                   {p.pricing?.type === "perChar" && (
                     <div className="grid grid-cols-2 gap-3">
-                      <Field label="תווים שכלולים במחיר הבסיס" hint="המחיר שלמעלה הוא מחיר הבסיס">
+                      <Field label="תווים שכלולים במחיר הבסיס" hint="0 = כל תו עולה">
                         <input type="number" min="0" value={p.pricing.included} onChange={(e) => update(p.id, { pricing: { ...p.pricing, included: Number(e.target.value) } })} className={inputCls} />
                       </Field>
                       <Field label="מחיר לכל תו נוסף (₪)">
